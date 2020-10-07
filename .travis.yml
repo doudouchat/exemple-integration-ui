@@ -1,0 +1,46 @@
+language: java
+services:
+  - docker
+jdk:
+    - openjdk8
+before_script:
+    - echo "MAVEN_OPTS='-Xmx1g'" > ~/.mavenrc
+    - git clone https://github.com/doudouchat/exemple-service.git /tmp/exemple-service
+    - git clone https://github.com/doudouchat/exemple-authorization.git /tmp/exemple-authorization
+    - git clone https://github.com/doudouchat/exemple-gateway.git /tmp/exemple-gateway
+    - git clone https://github.com/doudouchat/exemple-integration.git /tmp/exemple-integration
+    - mvn -f /tmp/exemple-service source:aggregate install:install-file -Dfile=/tmp/exemple-service/target/exemple-service-2.0.0-SNAPSHOT-sources.jar -DgroupId=exemple -DartifactId=exemple-service -Dpackaging=jar -Dversion=2.0.0-SNAPSHOT -Dclassifier=sources
+    - mvn -f /tmp/exemple-service clean install -Dmaven.test.skip=true
+    - docker build -t exemple-service /tmp/exemple-service
+    - mvn -f /tmp/exemple-authorization source:aggregate install:install-file -Dfile=/tmp/exemple-authorization/target/exemple-authorization-1.0.1-SNAPSHOT-sources.jar -DgroupId=exemple -DartifactId=exemple-authorization -Dpackaging=jar -Dversion=1.0.1-SNAPSHOT -Dclassifier=sources
+    - mvn -f /tmp/exemple-authorization clean install -Dmaven.test.skip=true
+    - docker build -t exemple-authorization /tmp/exemple-authorization
+    - mvn -f /tmp/exemple-gateway source:aggregate install:install-file -Dfile=/tmp/exemple-gateway/target/exemple-gateway-1.0.1-SNAPSHOT-sources.jar -DgroupId=exemple -DartifactId=exemple-gateway -Dpackaging=jar -Dversion=1.0.1-SNAPSHOT -Dclassifier=sources
+    - mvn -f /tmp/exemple-gateway clean install -Dmaven.test.skip=true
+    - docker build -t exemple-gateway /tmp/exemple-gateway
+    - docker build -t exemple-test /tmp/exemple-integration
+install: true
+script:
+    - docker-compose -f /tmp/exemple-integration/docker-compose.yml up -d zookeeper
+    - ./wait-for-container-ready.sh exemple-zookeeper
+    - chmod +x /tmp/exemple-integration/src/main/conf/zookeeper/load_authorization.sh
+    - docker container exec exemple-zookeeper ls -l /usr/local/etc/zookeeper
+    - docker container exec exemple-zookeeper /usr/local/etc/zookeeper/load_authorization.sh
+    - docker-compose -f /tmp/exemple-integration/docker-compose.yml up -d cassandra
+    - ./wait-for-container-ready.sh exemple-test
+    - docker container exec exemple-test ls -l /usr/local/tmp/cassandra
+    - docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
+    - docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+    - docker-compose -f /tmp/exemple-authorization/docker-compose.yml up -d authorization
+    - ./wait-for-container-ready.sh exemple-authorization
+    - docker-compose -f /tmp/exemple-service/docker-compose.yml up -d service
+    - ./wait-for-container-ready.sh exemple-service
+    - docker-compose -f /tmp/exemple-gateway/docker-compose.yml up -d gateway
+    - ./wait-for-container-ready.sh exemple-gateway
+    - docker container ls
+    - mvn -f /tmp/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
+    - mvn -f /tmp/exemple-integration clean verify -Pit -Dauthorization.port=8084 -Dapplication.port=8080
+sudo: false
+cache:
+    directories:
+        - $HOME/.m2
