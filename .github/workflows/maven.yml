@@ -1,0 +1,87 @@
+name: build
+on:
+- push
+- pull_request
+env:
+   MAVEN_OPTS: -Xmx1g
+jobs:
+   build:
+      runs-on: ubuntu-latest
+      steps:
+      -  uses: actions/checkout@v2
+      -  name: Set up JDK 1.8
+         uses: actions/setup-java@v1
+         with:
+            java-version: 1.8
+      -  name: Cache Maven packages
+         uses: actions/cache@v2
+         with:
+            path: ~/.m2
+            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+            restore-keys: ${{ runner.os }}-m2
+      -  name: Checkout exemple service
+         uses: actions/checkout@v2
+         with:
+            path: exemple-service
+            repository: doudouchat/exemple-service
+      -  name: Build exemple service
+         run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
+      -  name: build docker exemple service
+         run: docker build -t exemple-service ${{ github.workspace }}/exemple-service
+      -  name: Checkout exemple authorization
+         uses: actions/checkout@v2
+         with:
+            path: exemple-authorization
+            repository: doudouchat/exemple-authorization
+      -  name: Build exemple authorization
+         run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
+      -  name: build docker exemple authorization
+         run: docker build -t exemple-authorization ${{ github.workspace }}/exemple-authorization
+      -  name: Checkout exemple gateway
+         uses: actions/checkout@v2
+         with:
+            path: exemple-gateway
+            repository: doudouchat/exemple-gateway
+      -  name: Build exemple gateway
+         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true -fn
+      -  name: build docker exemple gateway
+         run: docker build -t exemple-gateway ${{ github.workspace }}/exemple-gateway
+      -  name: Checkout exemple integration
+         uses: actions/checkout@v2
+         with:
+            path: exemple-integration
+            repository: doudouchat/exemple-integration
+      -  name: Build exemple integration
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
+      -  name: build docker exemple integration
+         run: docker build -t exemple-test ${{ github.workspace }}/exemple-integration
+      -  name: launch zookeeper
+         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d zookeeper
+      -  name: check zookeeper
+         run: ./wait-for-container-ready.sh exemple-zookeeper
+      -  name: launch hazelcast
+         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d hazelcast
+      -  name: check hazelcast
+         run: ./wait-for-container-ready.sh exemple-hazelcast
+      -  name: launch test
+         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d cassandra
+      -  name: check test
+         run: ./wait-for-container-ready.sh exemple-test
+      -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
+      -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+      -  name: launch authorization
+         run: docker-compose -f ${{ github.workspace }}/exemple-authorization/docker-compose.yml up -d authorization
+      -  name: check authorization
+         run: ./wait-for-container-ready.sh exemple-authorization
+      -  name: launch service
+         run: docker-compose -f ${{ github.workspace }}/exemple-service/docker-compose.yml up -d service
+      -  name: check service
+         run: ./wait-for-container-ready.sh exemple-service
+      -  name: launch gateway
+         run: docker-compose -f ${{ github.workspace }}/exemple-gateway/docker-compose.yml up -d gateway
+      -  name: check gateway
+         run: ./wait-for-container-ready.sh exemple-gateway
+      -  name: test exemple integration by gateway
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
+      -  name: test exemple integration direct
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8084 -Dapplication.port=8080

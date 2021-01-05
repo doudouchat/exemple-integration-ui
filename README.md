@@ -1,3 +1,3 @@
-[![Build Status](https://travis-ci.com/doudouchat/exemple-integration-docker.svg?branch=master)](https://travis-ci.com/doudouchat/exemple-integration-docker)
+[![build](https://github.com/doudouchat/exemple-integration-docker/workflows/build/badge.svg)](https://github.com/doudouchat/exemple-integration-docker/actions)
 
 # exemple-docker
