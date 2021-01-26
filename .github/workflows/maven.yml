@@ -43,7 +43,7 @@ jobs:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
       -  name: Build exemple gateway
-         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true -fn
+         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
       -  name: build docker exemple gateway
          run: docker build -t exemple-gateway ${{ github.workspace }}/exemple-gateway
       -  name: Checkout exemple integration
