@@ -84,4 +84,4 @@ jobs:
       -  name: test exemple integration by gateway
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
       -  name: test exemple integration direct
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8084 -Dapplication.port=8080
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dapplication.port=8080
