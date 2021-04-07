@@ -9,6 +9,9 @@ jobs:
    build:
       runs-on: ubuntu-latest
       steps:
+      -  name: Get current date
+         id: date
+         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       -  uses: actions/checkout@v2
       -  name: Set up JDK 1.8
          uses: actions/setup-java@v1
@@ -86,3 +89,21 @@ jobs:
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
       -  name: test exemple integration direct
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dapplication.port=8080
+      -  name: display logs service
+         if: ${{ failure() }}
+         run: docker container logs exemple-service
+      -  name: display logs authorization
+         if: ${{ failure() }}
+         run: docker container logs exemple-authorization
+      -  name: display logs gateway
+         if: ${{ failure() }}
+         run: docker container logs exemple-gateway
+      -  name: display logs service
+         if: ${{ failure() }}
+         run: docker container exec exemple-service cat logs/archive/exemple_service.${{ steps.date.outputs.date }}.log
+      -  name: display logs authorization
+         if: ${{ failure() }}
+         run: docker container exec exemple-authorization cat logs/archive/exemple_authorization.${{ steps.date.outputs.date }}.log
+      -  name: display logs gateway
+         if: ${{ failure() }}
+         run: docker container exec exemple-gateway cat tmp/logs/archive/exemple_gateway.${{ steps.date.outputs.date }}.log
