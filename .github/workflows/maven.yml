@@ -59,6 +59,29 @@ jobs:
          run: mvn -f ${{ github.workspace }}/exemple-integration clean install
       -  name: build docker exemple integration
          run: docker build -t exemple-test ${{ github.workspace }}/exemple-integration
+      -  name: Get yarn cache directory path
+         id: yarn-cache-dir-path
+         run: echo "::set-output name=dir::$(yarn cache dir)"
+      -  uses: actions/cache@v2
+         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+         with:
+            path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            restore-keys: |
+               ${{ runner.os }}-yarn-
+      -  name: Use Node.js 12.8
+         uses: actions/setup-node@v1
+         with:
+            node-version: 12.8
+      -  run: npm install -g @angular/cli@10.2.0
+      -  uses: borales/actions-yarn@v2.0.0
+         with:
+            cmd: install
+      -  name: Checkout exemple ui
+         uses: actions/checkout@v2
+         with:
+            path: exemple-ui
+            repository: doudouchat/exemple-ui
       -  name: launch zookeeper
          run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d zookeeper
       -  name: check zookeeper
@@ -89,6 +112,19 @@ jobs:
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
       -  name: test exemple integration direct
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dapplication.port=8080
+      -  name: launch gateway
+         run: docker-compose -f ${{ github.workspace }}/exemple-gateway/docker-compose.yml -f ${{ github.workspace }}/exemple-gateway/docker-compose.browser.yml up -d gateway
+      -  name: check gateway
+         run: ./wait-for-container-ready.sh exemple-gateway
+      -  name: install exemple ui
+         working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
+         run: yarn --frozen-lockfile
+      -  name: build exmple ui
+         working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
+         run: ng build
+      -  name: test exemple ui
+         working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
+         run: ng e2e
       -  name: display logs service
          if: ${{ failure() }}
          run: docker container logs exemple-service
