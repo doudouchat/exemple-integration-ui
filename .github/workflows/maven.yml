@@ -1,8 +1,30 @@
 name: build
 on:
-- push
-- pull_request
-- workflow_dispatch
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      branch_service:
+        description: 'Service branch'
+        required: true
+        default: 'master'
+      branch_authorization:
+        description: 'Authorization branch'
+        required: true
+        default: 'master'
+      branch_gateway:
+        description: 'Gateway branch'
+        required: true
+        default: 'master'
+      branch_integration:
+        description: 'Integration branch'
+        required: true
+        default: 'master'
+      branch_ui:
+        description: 'UI branch'
+        required: true
+        default: 'master'
 env:
    MAVEN_OPTS: -Xmx1g
 jobs:
@@ -23,11 +45,16 @@ jobs:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
+      - name: maven-settings-xml-action
+        uses: whelk-io/maven-settings-xml-action@v14
+        with:
+           repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple service
          uses: actions/checkout@v2
          with:
             path: exemple-service
             repository: doudouchat/exemple-service
+            ref: ${{ github.event.inputs.branch_service }}
       -  name: Build exemple service
          run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
       -  name: build docker exemple service
@@ -37,6 +64,7 @@ jobs:
          with:
             path: exemple-authorization
             repository: doudouchat/exemple-authorization
+            ref: ${{ github.event.inputs.branch_authorization }}
       -  name: Build exemple authorization
          run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
       -  name: build docker exemple authorization
@@ -46,6 +74,7 @@ jobs:
          with:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
+            ref: ${{ github.event.inputs.branch_gateway }}
       -  name: Build exemple gateway
          run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
       -  name: build docker exemple gateway
@@ -55,6 +84,7 @@ jobs:
          with:
             path: exemple-integration
             repository: doudouchat/exemple-integration
+            ref: ${{ github.event.inputs.branch_integration }}
       -  name: Build exemple integration
          run: mvn -f ${{ github.workspace }}/exemple-integration clean install
       -  name: build docker exemple integration
@@ -82,6 +112,7 @@ jobs:
          with:
             path: exemple-ui
             repository: doudouchat/exemple-ui
+            ref: ${{ github.event.inputs.branch_ui }}
       -  name: launch zookeeper
          run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d zookeeper
       -  name: check zookeeper
