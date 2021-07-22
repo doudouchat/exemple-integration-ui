@@ -103,7 +103,6 @@ jobs:
          uses: actions/setup-node@v1
          with:
             node-version: 14.17.3
-      -  run: npm install -g @angular/cli@12.0.4
       -  uses: borales/actions-yarn@v2.0.0
          with:
             cmd: install
@@ -150,12 +149,12 @@ jobs:
       -  name: install exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: yarn --frozen-lockfile
-      -  name: build exmple ui
+      -  name: build exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
-         run: ng build
+         run: npm run-script build
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
-         run: ng e2e
+         run: npm run-script e2e
       -  name: display logs service
          if: ${{ failure() }}
          run: docker container logs exemple-service
