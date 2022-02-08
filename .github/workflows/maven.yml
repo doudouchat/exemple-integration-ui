@@ -154,7 +154,9 @@ jobs:
          run: npm run-script build
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
-         run: npm run-script e2e
+         run: |
+          node_modules/.bin/webdriver-manager update --versions.chrome 97.0.4692.99
+          npm run-script e2e -- --webdriver-update=false
       -  name: display logs service
          if: ${{ failure() }}
          run: docker container logs exemple-service
