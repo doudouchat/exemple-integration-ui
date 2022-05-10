@@ -157,6 +157,9 @@ jobs:
          run: |
           node_modules/.bin/webdriver-manager update --versions.chrome 100.0.4896.75
           npm run-script e2e -- --webdriver-update=false
+      -  name: display logs test
+         if: ${{ failure() }}
+         run: docker container logs exemple-test
       -  name: display logs service
          if: ${{ failure() }}
          run: docker container logs exemple-service
