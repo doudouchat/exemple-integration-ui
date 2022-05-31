@@ -161,8 +161,14 @@ jobs:
          run: |
           node_modules/.bin/webdriver-manager update --versions.chrome 102.0.5005.61
           npm run-script e2e -- --webdriver-update=false
-      -  name: display logs test
-         if: ${{ failure() }}
+      -  name: display logs hazelcast
+         if: ${{ always() }}
+         run: docker container logs exemple-hazelcast
+      -  name: display logs zookeeper
+         if: ${{ always() }}
+         run: docker container logs exemple-zookeeper
+      -  name: display logs cassandra
+         if: ${{ always() }}
          run: docker container logs exemple-test
       -  name: display logs service
          if: ${{ failure() }}
