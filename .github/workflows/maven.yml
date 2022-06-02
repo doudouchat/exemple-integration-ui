@@ -155,7 +155,7 @@ jobs:
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
-          node_modules/.bin/webdriver-manager update --versions.chrome 100.0.4896.75
+          node_modules/.bin/webdriver-manager update --versions.chrome 102.0.5005.61
           npm run-script e2e -- --webdriver-update=false
       -  name: display logs test
          if: ${{ failure() }}
