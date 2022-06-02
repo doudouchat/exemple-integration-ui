@@ -135,7 +135,7 @@ jobs:
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
       -  name: launch service
-         run: docker-compose -f ${{ github.workspace }}/exemple-service/docker-compose.yml up -d service
+         run: docker-compose up -d service
       -  name: check service
          run: ./wait-for-container-ready.sh exemple-service
       -  name: launch gateway
