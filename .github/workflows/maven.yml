@@ -87,11 +87,15 @@ jobs:
             ref: ${{ github.event.inputs.branch_integration }}
       -  name: Build exemple integration
          run: mvn -f ${{ github.workspace }}/exemple-integration clean install
+      -  name: copy sql
+         run: |
+            mkdir resources
+            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources/cassandra
       -  name: build docker exemple integration
-         run: docker build -t exemple-test ${{ github.workspace }}/exemple-integration
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+         run: docker build -t exemple-test .
+      -  name: Get yarn cache directory path
+         id: yarn-cache-dir-path
+         run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
       -  uses: actions/cache@v2
          id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
          with:
@@ -113,15 +117,15 @@ jobs:
             repository: doudouchat/exemple-ui
             ref: ${{ github.event.inputs.branch_ui }}
       -  name: launch zookeeper
-         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d zookeeper
+         run: docker-compose up -d zookeeper
       -  name: check zookeeper
          run: ./wait-for-container-ready.sh exemple-zookeeper
       -  name: launch hazelcast
-         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d hazelcast
+         run: docker-compose up -d hazelcast
       -  name: check hazelcast
          run: ./wait-for-container-ready.sh exemple-hazelcast
       -  name: launch test
-         run: docker-compose -f ${{ github.workspace }}/exemple-integration/docker-compose.yml up -d cassandra
+         run: docker-compose up -d cassandra
       -  name: check test
          run: ./wait-for-container-ready.sh exemple-test
       -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
