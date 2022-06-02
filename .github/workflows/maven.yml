@@ -139,7 +139,7 @@ jobs:
       -  name: check service
          run: ./wait-for-container-ready.sh exemple-service
       -  name: launch gateway
-         run: docker-compose -f ${{ github.workspace }}/exemple-gateway/docker-compose.yml up -d gateway
+         run: docker-compose up -d gateway
       -  name: check gateway
          run: ./wait-for-container-ready.sh exemple-gateway
       -  name: test exemple integration by gateway
@@ -147,7 +147,7 @@ jobs:
       -  name: test exemple integration direct
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dapplication.port=8080
       -  name: launch gateway
-         run: docker-compose -f ${{ github.workspace }}/exemple-gateway/docker-compose.yml -f ${{ github.workspace }}/exemple-gateway/docker-compose.browser.yml up -d gateway
+         run: docker-compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
       -  name: check gateway
          run: ./wait-for-container-ready.sh exemple-gateway
       -  name: install exemple ui
