@@ -131,7 +131,7 @@ jobs:
       -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
       -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
       -  name: launch authorization
-         run: docker-compose -f ${{ github.workspace }}/exemple-authorization/docker-compose.yml up -d authorization
+         run: docker-compose up -d authorization
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
       -  name: launch service

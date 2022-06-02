@@ -51,7 +51,31 @@ services:
       test: ["CMD", "curl", "-f", "-H", "accept:application/json", "http://172.17.0.1:5706/hazelcast/health/ready"]
       interval: 30s
       start_period: 30s
+  authorization:
+    container_name: exemple-authorization
+    image: exemple-authorization
+    networks:
+    - test
+    - authorization
+    environment:
+    - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast-client.yaml"
+    - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
+    - "JPDA_ADDRESS=8000"
+    - "JPDA_TRANSPORT=dt_socket"
+    entrypoint: /usr/local/tomcat/bin/catalina.sh jpda run
+    ports:
+    - 8090:8080
+    - 9090:8000
+    volumes:
+    - ./conf/authorization:/usr/local/tomcat/etc
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-H", "accept:application/json", "http://localhost:8080/ExempleAuthorization/actuator/health"]
+      interval: 30s
+      start_period: 30s
 networks:
   test:
     name: exemple-test
     driver: bridge
+  authorization:
+    driver: bridge
+    name: exemple-authorization

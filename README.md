@@ -2,7 +2,7 @@
 
 # exemple-integration-docker
 
-## Docker
+## Docker infrastructure
 
 <ol>
 <li>docker build -t exemple-test .</li>
@@ -15,4 +15,10 @@
 <li>docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql</li>
 <li>docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql</li>
 <li>docker-compose up -d hazelcast</li>
+</ol>
+
+## Docker authorization
+
+<ol>
+<li>docker-compose up -d authorization</li>
 </ol>
