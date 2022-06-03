@@ -58,7 +58,7 @@ jobs:
       -  name: Build exemple service
          run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
       -  name: build docker exemple service
-         run: docker build -t exemple-service ${{ github.workspace }}/exemple-service
+         run: docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-service
       -  name: Checkout exemple authorization
          uses: actions/checkout@v2
          with:
@@ -68,7 +68,7 @@ jobs:
       -  name: Build exemple authorization
          run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
       -  name: build docker exemple authorization
-         run: docker build -t exemple-authorization ${{ github.workspace }}/exemple-authorization
+         run: docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-authorization
       -  name: Checkout exemple gateway
          uses: actions/checkout@v2
          with:
@@ -78,7 +78,7 @@ jobs:
       -  name: Build exemple gateway
          run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
       -  name: build docker exemple gateway
-         run: docker build -t exemple-gateway ${{ github.workspace }}/exemple-gateway
+         run: docker build -t exemple-gateway --build-arg VERSION_OPENJDK=8-jdk-buster ${{ github.workspace }}/exemple-gateway
       -  name: Checkout exemple integration
          uses: actions/checkout@v2
          with:
