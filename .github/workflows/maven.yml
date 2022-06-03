@@ -157,7 +157,9 @@ jobs:
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
-          node_modules/.bin/webdriver-manager update --versions.chrome 102.0.5005.61
+          CHROME_VERSION=$(google-chrome --version | grep -ioE "[0-9.]{10,20}")
+          echo chrome version is $CHROME_VERSION
+          node_modules/.bin/webdriver-manager update --versions.chrome $CHROME_VERSION
           npm run-script e2e -- --webdriver-update=false
       -  name: display logs hazelcast
          if: ${{ always() }}
