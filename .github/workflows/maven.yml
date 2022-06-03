@@ -55,44 +55,24 @@ jobs:
             path: exemple-service
             repository: doudouchat/exemple-service
             ref: ${{ github.event.inputs.branch_service }}
-      -  name: Build exemple service
-         run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
-      -  name: build docker exemple service
-         run: docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-service
       -  name: Checkout exemple authorization
          uses: actions/checkout@v2
          with:
             path: exemple-authorization
             repository: doudouchat/exemple-authorization
             ref: ${{ github.event.inputs.branch_authorization }}
-      -  name: Build exemple authorization
-         run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
-      -  name: build docker exemple authorization
-         run: docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-authorization
       -  name: Checkout exemple gateway
          uses: actions/checkout@v2
          with:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
             ref: ${{ github.event.inputs.branch_gateway }}
-      -  name: Build exemple gateway
-         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
-      -  name: build docker exemple gateway
-         run: docker build -t exemple-gateway --build-arg VERSION_OPENJDK=8-jdk-buster ${{ github.workspace }}/exemple-gateway
       -  name: Checkout exemple integration
          uses: actions/checkout@v2
          with:
             path: exemple-integration
             repository: doudouchat/exemple-integration
             ref: ${{ github.event.inputs.branch_integration }}
-      -  name: Build exemple integration
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
-      -  name: copy sql
-         run: |
-            mkdir resources
-            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources/cassandra
-      -  name: build docker exemple integration
-         run: docker build -t exemple-test .
       -  name: Get yarn cache directory path
          id: yarn-cache-dir-path
          run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
@@ -124,20 +104,40 @@ jobs:
          run: docker-compose up -d hazelcast
       -  name: check hazelcast
          run: ./wait-for-container-ready.sh exemple-hazelcast
+      -  name: Build exemple integration
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
+      -  name: copy sql
+         run: |
+            mkdir resources
+            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources/cassandra
+      -  name: build docker exemple integration
+         run: docker build -t exemple-test .
       -  name: launch test
          run: docker-compose up -d cassandra
       -  name: check test
          run: ./wait-for-container-ready.sh exemple-test
       -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
       -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+      -  name: Build exemple authorization
+         run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
+      -  name: build docker exemple authorization
+         run: docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-authorization
       -  name: launch authorization
          run: docker-compose up -d authorization
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
+      -  name: Build exemple service
+         run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
+      -  name: build docker exemple service
+         run: docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.60-jdk8-openjdk ${{ github.workspace }}/exemple-service
       -  name: launch service
          run: docker-compose up -d service
       -  name: check service
          run: ./wait-for-container-ready.sh exemple-service
+      -  name: Build exemple gateway
+         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
+      -  name: build docker exemple gateway
+         run: docker build -t exemple-gateway --build-arg VERSION_OPENJDK=8-jdk-buster ${{ github.workspace }}/exemple-gateway
       -  name: launch gateway
          run: docker-compose up -d gateway
       -  name: check gateway
