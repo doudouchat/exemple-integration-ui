@@ -105,8 +105,6 @@ jobs:
       -  name: check hazelcast
          if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-hazelcast
-      -  name: Build exemple integration
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
       -  name: copy sql
          run: |
             mkdir resources
@@ -143,6 +141,8 @@ jobs:
          run: docker-compose up -d gateway
       -  name: check gateway
          run: ./wait-for-container-ready.sh exemple-gateway
+      -  name: Build exemple integration
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
       -  name: test exemple integration by gateway
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086
       -  name: test exemple integration direct
