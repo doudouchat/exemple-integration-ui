@@ -15,8 +15,7 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>/usr/local/tomcat/.logs/archive/exemple_service.%d{yyyy-MM-dd}.log
-			</fileNamePattern>
+			<fileNamePattern>/usr/local/tomcat/logs/archive/exemple_service.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>2</maxHistory>
 		</rollingPolicy>
 
