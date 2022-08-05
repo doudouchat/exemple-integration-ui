@@ -2,7 +2,7 @@ version: "3.5"
 services:
   cassandra:
     container_name: exemple-cassandra
-    image: cassandra:3.11.14
+    image: cassandra:4.1.0
     networks:
     - test
     environment:
@@ -16,7 +16,8 @@ services:
     - ./data/cassandra:/var/lib/cassandra
     healthcheck:
       test: ["CMD", "sh", "/usr/local/etc/cassandra/healthcheck_cassandra.sh"]
-      interval: 30s
+      interval: 10s
+      retries: 10
       start_period: 30s
   zookeeper:
     container_name: exemple-zookeeper
