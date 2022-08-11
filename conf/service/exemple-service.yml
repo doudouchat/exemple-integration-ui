@@ -25,6 +25,11 @@ store:
 application:
    zookeeper:
       host: 172.17.0.1:10024
+event:
+   kafka:
+      bootstrap-servers: 172.17.0.1:10026
+   topic: test
+   timeout: 10000
 api:
    authorization:
       path: http://172.17.0.1:8090/ExempleAuthorization

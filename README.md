@@ -15,6 +15,7 @@
 <li>docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql</li>
 <li>docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql</li>
 <li>docker-compose up -d hazelcast</li>
+<li>docker-compose up -d kafka</li>
 </ol>
 
 ## Docker authorization
