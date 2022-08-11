@@ -105,6 +105,8 @@ jobs:
       -  name: check hazelcast
          if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-hazelcast
+      -  name: launch kafka
+         run: docker-compose up -d kafka
       -  name: copy sql
          run: |
             mkdir resources
@@ -170,6 +172,9 @@ jobs:
       -  name: display logs zookeeper
          if: ${{ always() }}
          run: docker container logs exemple-zookeeper
+      -  name: display logs kafka
+         if: ${{ always() }}
+         run: docker container logs exemple-kafka
       -  name: display logs cassandra
          if: ${{ always() }}
          run: docker container logs exemple-test
