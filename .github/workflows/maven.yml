@@ -103,7 +103,6 @@ jobs:
       -  name: launch hazelcast
          run: docker-compose up -d hazelcast
       -  name: check hazelcast
-         if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-hazelcast
       -  name: launch kafka
          run: docker-compose up -d kafka
