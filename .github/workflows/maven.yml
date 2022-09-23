@@ -145,6 +145,7 @@ jobs:
       -  name: Build exemple integration
          run: mvn -f ${{ github.workspace }}/exemple-integration clean install
       -  name: test exemple integration by gateway
+         if: ${{ always() }}
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dapplication.port=8086 -Dzookeeper.port=10024 -Dhazelcast.port=5706
       -  name: test exemple integration direct
          run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dapplication.port=8080 -Dzookeeper.port=10024 -Dhazelcast.port=5706
