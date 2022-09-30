@@ -144,10 +144,8 @@ jobs:
          run: ./wait-for-container-ready.sh exemple-gateway
       -  name: Build exemple integration
          run: mvn -f ${{ github.workspace }}/exemple-integration clean install
-      -  name: test exemple integration by gateway
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8086 -Dservice.port=8086 -Dzookeeper.port=10024 -Dhazelcast.port=5706
-      -  name: test exemple integration direct
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dservice.port=8080 -Dzookeeper.port=10024 -Dhazelcast.port=5706
+      -  name: test exemple integration
+         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dservice.port=8080 -Dgateway.port=8086 -Dzookeeper.port=10024 -Dhazelcast.port=5706
       -  name: launch gateway
          run: docker-compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
       -  name: check gateway
