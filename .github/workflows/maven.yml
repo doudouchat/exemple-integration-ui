@@ -97,58 +97,59 @@ jobs:
             repository: doudouchat/exemple-ui
             ref: ${{ github.event.inputs.branch_ui }}
       -  name: launch zookeeper
-         run: docker-compose up -d zookeeper
-      -  name: check zookeeper
-         run: ./wait-for-container-ready.sh exemple-zookeeper
+         run: |
+           docker-compose up -d zookeeper
+           ./wait-for-container-ready.sh exemple-zookeeper
+           docker container exec exemple-zookeeper ls -la
+           docker container exec exemple-zookeeper bin/zkCli.sh create /authorization
+           docker container exec exemple-zookeeper bin/zkCli.sh create /authorization/resource
+           docker container exec exemple-zookeeper bin/zkCli.sh set /authorization/resource '{"client_id":"resource","client_secret":"{bcrypt}$2a$10$I3FyNzNSYN5R5U.4GOWpp.0Np33uJ59p412xzdit798c1jJHCsPja","authorized_grant_types":["client_credentials"],"redirect_uri":[],"autoapprove":[],"authorities":["ROLE_TRUSTED_CLIENT"]}'
+           docker container exec exemple-zookeeper bin/zkCli.sh create /authorization/test_service
+           docker container exec exemple-zookeeper bin/zkCli.sh set /authorization/test_service '{"scope":["account:create","login:head","login:create","subscription:update","subscription:read"],"client_id":"test_service","client_secret":"{bcrypt}$2a$10$FTfSAcT9WVzgHIPqT6dGU.THUVQNReDhMXlB.aq1C8FCPPktD2.Lq","authorized_grant_types":["client_credentials"],"redirect_uri":["xxx"],"autoapprove":["login:create","account:create","subscription:update","subscription:read"],"authorities":["ROLE_APP"],"keyspace":"test_authorization"}'
+           docker container exec exemple-zookeeper bin/zkCli.sh create /authorization/test_service_user
+           docker container exec exemple-zookeeper bin/zkCli.sh set /authorization/test_service_user '{"scope":["account:read","account:update","login:create","login:update","login:delete","login:read","login:head"],"client_id":"test_service_user","client_secret":"{bcrypt}$2a$10$FTfSAcT9WVzgHIPqT6dGU.THUVQNReDhMXlB.aq1C8FCPPktD2.Lq","authorized_grant_types":["password","authorization_code","refresh_token"],"redirect_uri":["xxx"],"autoapprove":["account:read","login:create","login:delete","account:update","login:read","login:update"],"authorities":["ROLE_APP"],"keyspace":"test_authorization"}'
+           docker container exec exemple-zookeeper bin/zkCli.sh create /application
+           docker container exec exemple-zookeeper bin/zkCli.sh create /application/test
+           docker container exec exemple-zookeeper bin/zkCli.sh set /application/test '{"keyspace":"test_service","authorization_keyspace":"test_authorization","company":"test_company","authorization_clientIds":["test_service","test_service_user"],"clientIds":["test_service","test_service_user"]}'
       -  name: launch hazelcast
-         run: docker-compose up -d hazelcast
-      -  name: check hazelcast
-         run: ./wait-for-container-ready.sh exemple-hazelcast
+         run: |
+           docker-compose up -d hazelcast
       -  name: launch kafka
          run: docker-compose up -d kafka
-      -  name: copy sql
+      -  name: launch cassandra
          run: |
             mkdir resources
-            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources/cassandra
-      -  name: build docker exemple integration
-         run: docker build -t exemple-test .
-      -  name: launch test
-         run: docker-compose up -d cassandra
-      -  name: check test
-         run: ./wait-for-container-ready.sh exemple-test
-      -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
-      -  run: docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
+            cp conf/service/schemas/test_service_schema.cql resources/cassandra
+            docker build -t exemple-test .
+            docker-compose up -d cassandra
+            ./wait-for-container-ready.sh exemple-test
+            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
+            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql
       -  name: Build exemple authorization
-         run: mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
-      -  name: build docker exemple authorization
-         run: docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-authorization
-      -  name: launch authorization
-         run: docker-compose up -d authorization
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
+            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-authorization
+            docker-compose up -d authorization
       -  name: check authorization
+         if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-authorization
       -  name: Build exemple service
-         run: mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
-      -  name: build docker exemple service
-         run: docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-service
-      -  name: launch service
-         run: docker-compose up -d service
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
+            docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-service
+            docker-compose up -d service
       -  name: check service
+         if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-service
       -  name: Build exemple gateway
-         run: mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
-      -  name: build docker exemple gateway
-         run: docker build -t exemple-gateway --build-arg VERSION_OPENJDK=17-jdk-buster ${{ github.workspace }}/exemple-gateway
-      -  name: launch gateway
-         run: docker-compose up -d gateway
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-gateway clean install -Dmaven.test.skip=true
+            docker build -t exemple-gateway --build-arg VERSION_OPENJDK=17-jdk-buster ${{ github.workspace }}/exemple-gateway
+            docker-compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
       -  name: check gateway
-         run: ./wait-for-container-ready.sh exemple-gateway
-      -  name: Build exemple integration
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean install
-      -  name: test exemple integration
-         run: mvn -f ${{ github.workspace }}/exemple-integration clean verify -Pit -Dauthorization.port=8090 -Dservice.port=8080 -Dgateway.port=8086 -Dzookeeper.port=10024 -Dhazelcast.port=5706
-      -  name: launch gateway
-         run: docker-compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
-      -  name: check gateway
+         if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-gateway
       -  name: install exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
