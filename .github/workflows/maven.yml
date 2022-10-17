@@ -45,10 +45,10 @@ jobs:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v14
-        with:
-           repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+      -  name: maven-settings-xml-action
+         uses: whelk-io/maven-settings-xml-action@v14
+         with:
+            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple service
          uses: actions/checkout@v2
          with:
@@ -176,20 +176,20 @@ jobs:
          if: ${{ always() }}
          run: docker container logs exemple-test
       -  name: display logs service
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container logs exemple-service
       -  name: display logs authorization
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container logs exemple-authorization
       -  name: display logs gateway
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container logs exemple-gateway
       -  name: display logs service
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container exec exemple-service cat logs/archive/exemple_service.${{ steps.date.outputs.date }}.log
       -  name: display logs authorization
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container exec exemple-authorization cat logs/archive/exemple_authorization.${{ steps.date.outputs.date }}.log
       -  name: display logs gateway
-         if: ${{ failure() }}
+         if: ${{ always() }}
          run: docker container exec exemple-gateway cat tmp/logs/archive/exemple_gateway.${{ steps.date.outputs.date }}.log
