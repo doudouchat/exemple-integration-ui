@@ -87,7 +87,7 @@ jobs:
          uses: actions/setup-node@v1
          with:
             node-version: 14.17.3
-      -  uses: borales/actions-yarn@v2.0.0
+      -  uses: borales/actions-yarn@v3.0.0
          with:
             cmd: install
       -  name: Checkout exemple ui
@@ -157,6 +157,9 @@ jobs:
       -  name: build exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: npm run-script build
+      -  name: pre-test exemple
+         run: |
+          npm run-script test
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
