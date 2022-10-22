@@ -7,8 +7,8 @@ const client = new cassandra.Client({
 });
 
 Given('delete username {string}', (username: string) => {
-    client.execute('delete from test_authorization.login where username = ?', [username]);
-    client.execute('delete from test_service.login where username = ?', [username]);
+    //client.execute('delete from test_authorization.login where username = ?', [username]);
+    //client.execute('delete from test_service.login where username = ?', [username]);
 });
 
 Given('get authorization to create account', () => {
