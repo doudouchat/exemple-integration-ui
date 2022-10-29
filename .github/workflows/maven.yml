@@ -119,12 +119,11 @@ jobs:
             mkdir resources
             cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
             cp conf/service/schemas/test_service_schema.cql resources/cassandra
-            docker build -t exemple-test .
             docker-compose up -d cassandra
-            ./wait-for-container-ready.sh exemple-test
-            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
-            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
-            docker container exec exemple-test cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql
+            ./wait-for-container-ready.sh exemple-cassandra
+            docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/schema.cql
+            docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
+            docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql
       -  name: Build exemple authorization
          run: |
             mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
@@ -174,7 +173,7 @@ jobs:
          run: docker container logs exemple-kafka
       -  name: display logs cassandra
          if: ${{ always() }}
-         run: docker container logs exemple-test
+         run: docker container logs exemple-cassandra
       -  name: display logs service
          if: ${{ always() }}
          run: docker container logs exemple-service
