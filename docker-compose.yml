@@ -1,8 +1,8 @@
 version: "3.5"
 services:
   cassandra:
-    container_name: exemple-test
-    image: exemple-test
+    container_name: exemple-cassandra
+    image: cassandra:3.11.14
     networks:
     - test
     environment:
