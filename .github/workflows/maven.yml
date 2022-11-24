@@ -127,7 +127,7 @@ jobs:
       -  name: Build exemple authorization
          run: |
             mvn -f ${{ github.workspace }}/exemple-authorization clean install -Dmaven.test.skip=true
-            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-authorization
+            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=9.0.69-jdk17 ${{ github.workspace }}/exemple-authorization
             docker-compose up -d authorization
       -  name: check authorization
          if: ${{ false }}
@@ -135,7 +135,7 @@ jobs:
       -  name: Build exemple service
          run: |
             mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
-            docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.68-jdk17 ${{ github.workspace }}/exemple-service
+            docker build -t exemple-service --build-arg VERSION_TOMCAT=9.0.69-jdk17 ${{ github.workspace }}/exemple-service
             docker-compose up -d service
       -  name: check service
          if: ${{ false }}
