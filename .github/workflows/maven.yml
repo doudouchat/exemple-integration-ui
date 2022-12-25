@@ -135,7 +135,7 @@ jobs:
       -  name: Build exemple service
          run: |
             mvn -f ${{ github.workspace }}/exemple-service clean install -Dmaven.test.skip=true
-            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.1-jdk17 ${{ github.workspace }}/exemple-service
+            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.4-jdk17 ${{ github.workspace }}/exemple-service
             docker-compose up -d service
       -  name: check service
          if: ${{ false }}
