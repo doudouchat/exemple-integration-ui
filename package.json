@@ -2,7 +2,7 @@
   "name": "exemple-integration-ui",
   "version": "0.0.0",
   "scripts": {
-    "test": "node_modules/.bin/cucumber-js -p default"
+    "test": "cucumber-js -p default"
   },
   "private": true,
   "devDependencies": {
