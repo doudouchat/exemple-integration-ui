@@ -53,7 +53,7 @@ services:
       start_period: 30s
   kafka:
     container_name: exemple-kafka
-    image: bitnami/kafka:3.2.0
+    image: bitnami/kafka:3.3.2
     networks:
     - test
     ports:
