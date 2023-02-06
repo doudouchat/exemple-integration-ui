@@ -74,5 +74,8 @@
 	"clientIds": [
 		"test_service",
 		"test_service_user"
-	]
+	],
+	"account": {
+        "uniqueProperties": [ "email" ]
+    }
 }'
