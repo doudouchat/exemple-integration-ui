@@ -71,11 +71,10 @@ services:
     image: exemple-authorization
     networks:
     - test
-    - authorization
     environment:
     - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.config=/usr/local/tomcat/etc/hazelcast.yaml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast-client.yaml"
     - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
-    - "JPDA_ADDRESS=8000"
+    - "JPDA_ADDRESS=*:8000"
     - "JPDA_TRANSPORT=dt_socket"
     entrypoint: /usr/local/tomcat/bin/catalina.sh jpda run
     ports:
@@ -92,8 +91,6 @@ services:
     image: exemple-service
     networks:
     - test
-    - authorization
-    - service
     environment:
     - "CATALINA_OPTS=-Dlogging.config=file:/usr/local/tomcat/etc/logback.xml -Dhazelcast.client.config=/usr/local/tomcat/etc/hazelcast.yaml"
     - "JAVA_OPTS=-Xms256m -Xmx512m -XX:MetaspaceSize=128m"
@@ -114,13 +111,12 @@ services:
     container_name: exemple-gateway
     image: exemple-gateway
     networks:
-    - authorization
-    - service
+    - test
     environment:
     - "--spring.config.location=/usr/local/etc/gateway/exemple-gateway.yml"
     - "--server.servlet.context-path=/"
     - "JAVA_OPTS=-Xms256m -Xmx1g"
-    - "JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
+    - "JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=*:8000,server=y,suspend=n"
     ports:
     - 8086:8080
     - 9086:8000
@@ -134,9 +130,3 @@ networks:
   test:
     name: exemple-test
     driver: bridge
-  authorization:
-    driver: bridge
-    name: exemple-authorization
-  service:
-    driver: bridge
-    name: exemple-service

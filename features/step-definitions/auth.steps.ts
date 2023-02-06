@@ -25,7 +25,11 @@ AfterAll(async () => {
 
 Given('delete username {string}', async (username: string) => {
     await client.execute('delete from test_authorization.login where username = ?', [username]);
-    await client.execute('delete from test_service.login where username = ?', [username]);
+    const row = (await client.execute('select id from test_service.account where email = ?', [username])).first();
+    if (row) {
+        const id = row.getObject(0);
+        await client.execute('delete from test_service.account where id = ?', [id]);
+    }
 });
 
 Given('get authorization to create account', async function (this: AccountContext) {
@@ -74,7 +78,7 @@ Given('get access for username {string} and password {string}', async function (
         });
 
     const location = authorizeResponse.headers['location'];
-console.log(location);
+    console.log(location);
     const locationMatcher = /.*code=([a-zA-Z0-9\-_]*)(&state=)?(.*)?/g;
     const matches = locationMatcher.exec(location);
     const code = matches[1];
