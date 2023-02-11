@@ -12,10 +12,7 @@
 	"authorizationGrantTypes": [
 		"client_credentials"
 	],
-	"requireAuthorizationConsent": false,
-	"scopes": [
-		"ROLE_TRUSTED_CLIENT"
-	]
+	"requireAuthorizationConsent": false
 }'
 ./bin/zkCli.sh create /authorization/test_service
 ./bin/zkCli.sh set /authorization/test_service '{
