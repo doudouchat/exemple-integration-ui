@@ -228,7 +228,7 @@ jobs:
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
-          npm run-script e2e
+          npm run-script e2e:ci
       -  name: display logs hazelcast
          if: ${{ always() }}
          run: docker container logs exemple-hazelcast
