@@ -37,7 +37,7 @@ jobs:
       -  name: Get current date
          id: date
          run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      -  uses: actions/checkout@v2
+      -  uses: actions/checkout@v3
       -  name: Set up JDK 17
          uses: actions/setup-java@v1
          with:
@@ -53,25 +53,25 @@ jobs:
          with:
             repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple service
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
          with:
             path: exemple-service
             repository: doudouchat/exemple-service
             ref: ${{ github.event.inputs.branch_service }}
       -  name: Checkout exemple authorization
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
          with:
             path: exemple-authorization
             repository: doudouchat/exemple-authorization
             ref: ${{ github.event.inputs.branch_authorization }}
       -  name: Checkout exemple gateway
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
          with:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
             ref: ${{ github.event.inputs.branch_gateway }}
       -  name: Checkout exemple integration
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
          with:
             path: exemple-integration
             repository: doudouchat/exemple-integration
@@ -92,7 +92,7 @@ jobs:
          with:
             node-version: 16.18.0
       -  name: Checkout exemple ui
-         uses: actions/checkout@v2
+         uses: actions/checkout@v3
          with:
             path: exemple-ui
             repository: doudouchat/exemple-ui
