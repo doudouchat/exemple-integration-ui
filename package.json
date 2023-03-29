@@ -6,7 +6,7 @@
   },
   "private": true,
   "devDependencies": {
-    "@cucumber/cucumber": "^7.2.1",
+    "@cucumber/cucumber": "^9.1.0",
     "@types/chai": "^4.1.7",
     "@types/node": "^12.11.1",
     "chai": "^4.2.0",
