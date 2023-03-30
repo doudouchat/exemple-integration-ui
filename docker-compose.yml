@@ -128,6 +128,13 @@ services:
       test: ["CMD", "curl", "-f", "-H", "accept:application/json", "http://localhost:8080/actuator/health"]
       interval: 30s
       start_period: 30s
+  ui:
+    container_name: exemple-ui
+    image: exemple-ui
+    networks:
+    - test
+    ports:
+    - 4200:80
 networks:
   test:
     name: exemple-test

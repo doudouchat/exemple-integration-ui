@@ -220,9 +220,10 @@ jobs:
       -  name: check gateway
          if: ${{ false }}
          run: ./wait-for-container-ready.sh exemple-gateway
-      -  name: install exemple ui
-         working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
-         run: npm ci
+      -  name: Build exemple ui
+         run: |
+            docker build -t exemple-ui --build-arg VERSION_NODE=16.18.0 --build-arg VERSION_NGINX=1.22.0 ${{ github.workspace }}/exemple-ui
+            docker-compose up -d ui
       -  name: pre-test exemple
          run: |
             npm ci
@@ -230,7 +231,8 @@ jobs:
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
-          npm run-script e2e:ci
+            npm ci
+            npm run-script e2e:docker
       -  name: display logs hazelcast
          if: ${{ always() }}
          run: docker container logs exemple-hazelcast
@@ -261,3 +263,6 @@ jobs:
       -  name: display logs gateway
          if: ${{ always() }}
          run: docker container exec exemple-gateway cat tmp/logs/archive/exemple_gateway.${{ steps.date.outputs.date }}.log
+      -  name: display logs ui
+         if: ${{ always() }}
+         run: docker container logs exemple-ui
