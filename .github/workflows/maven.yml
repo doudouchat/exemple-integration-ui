@@ -222,7 +222,7 @@ jobs:
          run: ./wait-for-container-ready.sh exemple-gateway
       -  name: Build exemple ui
          run: |
-            docker build -t exemple-ui --build-arg VERSION_NODE=16.18.0 --build-arg VERSION_NGINX=1.22.0 ${{ github.workspace }}/exemple-ui
+            docker build -t exemple-ui --build-arg VERSION_NODE=16.18.0 --build-arg VERSION_NGINX=1.22.1 ${{ github.workspace }}/exemple-ui
             docker-compose up -d ui
       -  name: pre-test exemple
          run: |
