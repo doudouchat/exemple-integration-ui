@@ -32,9 +32,57 @@ concurrency:
   group: ${{ github.repository }}
   cancel-in-progress: false
 env:
-   MAVEN_OPTS: -Xmx1g
+   MAVEN_OPTS: -Xmx2g
 jobs:
-   build:
+   authorization:
+      runs-on: ubuntu-latest
+      steps:
+      -  name: Get current date
+         id: date
+         run: echo "date=$(date +'%Y-%m-%d')"  >> $GITHUB_OUTPUT
+      -  uses: actions/checkout@v4
+      -  name: Set up JDK 21
+         uses: actions/setup-java@v4
+         with:
+            distribution: 'zulu'
+            java-version: 21
+      -  name: Cache Maven packages
+         uses: actions/cache@v4
+         with:
+            path: ~/.m2
+            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+            restore-keys: ${{ runner.os }}-m2
+      -  name: maven-settings-xml-action
+         uses: whelk-io/maven-settings-xml-action@v22
+         with:
+            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+            plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+      -  name: Checkout exemple authorization
+         uses: actions/checkout@v4
+         with:
+            path: exemple-authorization
+            repository: doudouchat/exemple-authorization
+            ref: ${{ github.event.inputs.branch_authorization }}
+      -  name: Build exemple authorization
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-authorization --batch-mode clean install -Dmaven.test.skip=true
+      -  name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v3
+      -  name: Push image authorization
+         uses: docker/build-push-action@v6
+         with:
+           context: ${{ github.workspace }}/exemple-authorization
+           tags: exemple-authorization
+           build-args: VERSION_TOMCAT=10.1.30-jdk21
+           outputs: type=docker,dest=/tmp/authorization.tar
+           cache-from: type=gha
+           cache-to: type=gha,mode=max
+      -  name: Upload authorization
+         uses: actions/upload-artifact@v4
+         with:
+           name: authorization
+           path: /tmp/authorization.tar
+   service:
       runs-on: ubuntu-latest
       steps:
       -  name: Get current date
@@ -63,24 +111,77 @@ jobs:
             path: exemple-service
             repository: doudouchat/exemple-service
             ref: ${{ github.event.inputs.branch_service }}
-      -  name: Checkout exemple authorization
-         uses: actions/checkout@v4
+      -  name: Build exemple service
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-service --batch-mode clean install -Dmaven.test.skip=true
+      -  name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v3
+      -  name: Push image service
+         uses: docker/build-push-action@v6
          with:
-            path: exemple-authorization
-            repository: doudouchat/exemple-authorization
-            ref: ${{ github.event.inputs.branch_authorization }}
+           context: ${{ github.workspace }}/exemple-service
+           tags: exemple-service
+           build-args: VERSION_TOMCAT=10.1.30-jdk21
+           outputs: type=docker,dest=/tmp/service.tar
+           cache-from: type=gha
+           cache-to: type=gha,mode=max
+      -  name: Upload service
+         uses: actions/upload-artifact@v4
+         with:
+           name: service
+           path: /tmp/service.tar
+   gateway:
+      runs-on: ubuntu-latest
+      steps:
+      -  name: Get current date
+         id: date
+         run: echo "date=$(date +'%Y-%m-%d')"  >> $GITHUB_OUTPUT
+      -  uses: actions/checkout@v4
+      -  name: Set up JDK 21
+         uses: actions/setup-java@v4
+         with:
+            distribution: 'zulu'
+            java-version: 21
+      -  name: Cache Maven packages
+         uses: actions/cache@v4
+         with:
+            path: ~/.m2
+            key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+            restore-keys: ${{ runner.os }}-m2
+      -  name: maven-settings-xml-action
+         uses: whelk-io/maven-settings-xml-action@v22
+         with:
+            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+            plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple gateway
          uses: actions/checkout@v4
          with:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
             ref: ${{ github.event.inputs.branch_gateway }}
-      -  name: Checkout exemple integration
-         uses: actions/checkout@v4
+      -  name: Build exemple gateway
+         run: |
+            mvn -f ${{ github.workspace }}/exemple-gateway --batch-mode clean install -Dmaven.test.skip=true
+      -  name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v3
+      -  name: Push image gateway
+         uses: docker/build-push-action@v6
          with:
-            path: exemple-integration
-            repository: doudouchat/exemple-integration
-            ref: ${{ github.event.inputs.branch_integration }}
+           context: ${{ github.workspace }}/exemple-gateway
+           tags: exemple-gateway
+           build-args: VERSION_OPENJDK=21-jdk
+           outputs: type=docker,dest=/tmp/gateway.tar
+           cache-from: type=gha
+           cache-to: type=gha,mode=max
+      -  name: Upload gateway
+         uses: actions/upload-artifact@v4
+         with:
+           name: gateway
+           path: /tmp/gateway.tar
+   ui:
+      runs-on: ubuntu-latest
+      steps:
+      -  uses: actions/checkout@v4
       -  name: Get npm cache directory
          id: npm-cache-dir
          shell: bash
@@ -103,9 +204,101 @@ jobs:
             path: exemple-ui
             repository: doudouchat/exemple-ui
             ref: ${{ github.event.inputs.branch_ui }}
-      -  name: launch zookeeper
+      -  name: Set up Docker Buildx
+         uses: docker/setup-buildx-action@v3
+      -  name: Push image ui
+         uses: docker/build-push-action@v6
+         with:
+           context: ${{ github.workspace }}/exemple-ui
+           tags: exemple-ui
+           build-args: |
+             VERSION_NODE=20.14.0
+             VERSION_NGINX=1.24.0
+           outputs: type=docker,dest=/tmp/ui.tar
+           cache-from: type=gha
+           cache-to: type=gha,mode=max
+      -  name: Upload ui
+         uses: actions/upload-artifact@v4
+         with:
+           name: ui
+           path: /tmp/ui.tar
+   test:
+      needs: [service, authorization, gateway, ui]
+      runs-on: ubuntu-latest
+      steps:
+      -  name: Get current date
+         id: date
+         run: echo "date=$(date +'%Y-%m-%d')"  >> $GITHUB_OUTPUT
+      -  uses: actions/checkout@v4
+      -  name: Checkout exemple integration
+         uses: actions/checkout@v4
+         with:
+            path: exemple-integration
+            repository: doudouchat/exemple-integration
+            ref: ${{ github.event.inputs.branch_integration }}
+      -  name: Get npm cache directory
+         id: npm-cache-dir
+         shell: bash
          run: |
-           docker compose up -d zookeeper
+           echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      -  uses: actions/cache@v4
+         id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+         with:
+           path: ${{ steps.npm-cache-dir.outputs.dir }}
+           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+           restore-keys: |
+            ${{ runner.os }}-node-
+      -  name: Use Node.js 20.14.0
+         uses: actions/setup-node@v4
+         with:
+            node-version: 20.14.0
+      -  name: Checkout exemple integration
+         uses: actions/checkout@v4
+         with:
+            path: exemple-integration
+            repository: doudouchat/exemple-integration
+            ref: ${{ github.event.inputs.branch_integration }}
+      -  name: Checkout exemple ui
+         uses: actions/checkout@v4
+         with:
+            path: exemple-ui
+            repository: doudouchat/exemple-ui
+            ref: ${{ github.event.inputs.branch_ui }}
+      -  name: Download image authorization
+         uses: actions/download-artifact@v4
+         with:
+            name: authorization
+            path: /tmp/      
+      -  name: Download image service
+         uses: actions/download-artifact@v4
+         with:
+            name: service
+            path: /tmp/
+      -  name: Download image gateway
+         uses: actions/download-artifact@v4
+         with:
+            name: gateway
+            path: /tmp/
+      -  name: Download image ui
+         uses: actions/download-artifact@v4
+         with:
+            name: ui
+            path: /tmp/
+      -  name: launch infrastructure
+         run: |
+            mkdir resources
+            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
+            cp conf/service/schemas/test_service_schema.cql resources/cassandra
+            docker compose up -d zookeeper hazelcast kafka cassandra
+      -  name: launch domain
+         run: |
+            docker load --input /tmp/authorization.tar
+            docker load --input /tmp/service.tar
+            docker load --input /tmp/gateway.tar
+            docker load --input /tmp/ui.tar
+            docker compose -f docker-compose.yml -f docker-compose.browser.yml up -d authorization service gateway ui
+      -  name: init zookeeper
+         run: |
            ./wait-for-container-ready.sh exemple-zookeeper
            docker container exec exemple-zookeeper ls -la          
            docker container exec exemple-zookeeper bin/zkCli.sh create /authorization
@@ -186,41 +379,13 @@ jobs:
                    "uniqueProperties": [ "email" ]
                }
            }'
-      -  name: launch hazelcast
+      -  name: init cassandra
          run: |
-           docker compose up -d hazelcast
-      -  name: launch kafka
-         run: docker compose up -d kafka
-      -  name: launch cassandra
-         run: |
-            mkdir resources
-            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
-            cp conf/service/schemas/test_service_schema.cql resources/cassandra
-            docker compose up -d cassandra
             ./wait-for-container-ready.sh exemple-cassandra
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/service.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/authorization.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql
-      -  name: Build exemple authorization
-         run: |
-            mvn -f ${{ github.workspace }}/exemple-authorization --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=10.1.30-jdk21 ${{ github.workspace }}/exemple-authorization
-            docker compose up -d authorization
-      -  name: Build exemple service
-         run: |
-            mvn -f ${{ github.workspace }}/exemple-service --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.30-jdk21 ${{ github.workspace }}/exemple-service
-            docker compose up -d service
-      -  name: Build exemple gateway
-         run: |
-            mvn -f ${{ github.workspace }}/exemple-gateway --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-gateway --build-arg VERSION_OPENJDK=21-jdk ${{ github.workspace }}/exemple-gateway
-            docker compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
-      -  name: Build exemple ui
-         run: |
-            docker build -t exemple-ui --build-arg VERSION_NODE=20.14.0 --build-arg VERSION_NGINX=1.24.0 ${{ github.workspace }}/exemple-ui
-            docker compose up -d ui
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
       -  name: check service
@@ -270,3 +435,4 @@ jobs:
       -  name: display logs ui
          if: ${{ always() }}
          run: docker container logs exemple-ui
+
