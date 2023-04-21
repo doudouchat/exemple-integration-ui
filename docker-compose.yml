@@ -68,6 +68,7 @@ services:
       KAFKA_CFG_LISTENERS: CLIENT://:9092,EXTERNAL://:9093
       KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://localhost:9092,EXTERNAL://172.17.0.1:10026
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
+      KAFKA_ENABLE_KRAFT: "no"
   authorization:
     container_name: exemple-authorization
     image: exemple-authorization
