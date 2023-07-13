@@ -13,6 +13,6 @@
     "cassandra-driver": "^4.6.3",
     "chai": "^4.2.0",
     "ts-node": "^10.0.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.1.6"
   }
 }
