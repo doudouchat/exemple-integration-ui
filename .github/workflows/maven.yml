@@ -90,10 +90,10 @@ jobs:
            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
            restore-keys: |
             ${{ runner.os }}-node-
-      -  name: Use Node.js 18.15.0
+      -  name: Use Node.js 20.5.0
          uses: actions/setup-node@v3
          with:
-            node-version: 18.15.0
+            node-version: 20.5.0
       -  name: Checkout exemple ui
          uses: actions/checkout@v3
          with:
@@ -214,7 +214,7 @@ jobs:
             docker-compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
       -  name: Build exemple ui
          run: |
-            docker build -t exemple-ui --build-arg VERSION_NODE=18.15.0 --build-arg VERSION_NGINX=1.24.0 ${{ github.workspace }}/exemple-ui
+            docker build -t exemple-ui --build-arg VERSION_NODE=20.5.0 --build-arg VERSION_NGINX=1.24.0 ${{ github.workspace }}/exemple-ui
             docker-compose up -d ui
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
