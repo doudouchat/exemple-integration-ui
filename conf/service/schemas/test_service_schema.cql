@@ -4,7 +4,7 @@ INSERT INTO test_service.resource_schema (app, version, resource, profile, conte
 	'account',
 	'user',
 	'{
-		"$schema": "http://json-schema.org/draft-07/schema",
+		"$schema": "http://json-schema.org/draft/2020-12/schema",
 		"additionalProperties": false,
 		"required": [
 			"email",
