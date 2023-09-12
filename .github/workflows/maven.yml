@@ -144,12 +144,14 @@ jobs:
            docker container exec exemple-zookeeper bin/zkCli.sh set /authorization/test_service_user '{
                "id": "test_service_user",
                "clientId": "test_service_user",
-               "clientSecret": "{bcrypt}$2a$10$FTfSAcT9WVzgHIPqT6dGU.THUVQNReDhMXlB.aq1C8FCPPktD2.Lq",
                "authorizationGrantTypes": [
                    "authorization_code",
                    "refresh"
                ],
                "requireAuthorizationConsent": false,
+               "clientAuthenticationMethods": [
+                   "none"
+               ],
                "redirectUris": [
                    "http://xxx"
                ],

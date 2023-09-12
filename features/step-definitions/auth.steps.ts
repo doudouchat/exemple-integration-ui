@@ -1,5 +1,6 @@
 import { AfterAll, BeforeAll, Given } from '@cucumber/cucumber';
 import * as cassandra from 'cassandra-driver';
+import { v4 as uuidv4 } from 'uuid';
 import { AccountContext } from '../step-definitions/account.context';
 
 const client = new cassandra.Client({
@@ -7,6 +8,8 @@ const client = new cassandra.Client({
     localDataCenter: 'datacenter1'
 });
 const axios = require('axios');
+const sha256 = require("crypto-js/sha256");
+const base64 = require("crypto-js/enc-base64url");
 
 BeforeAll(() => {
     axios.interceptors.request.use(request => {
@@ -68,9 +71,19 @@ Given('get access for username {string} and password {string}', async function (
         });
     const xAuthToken = loginResponse.headers['x-auth-token'];
 
-    const authorizeResponse = await axios.get('http://localhost:8090/ExempleAuthorization/oauth/authorize?response_type=code&client_id=test_service_user&scope=account%3Aread%20login%3Ahead%20login%3Aread',
+    const codeVerifier = uuidv4();
+    const codeChallenge = base64.stringify(sha256(codeVerifier));
+
+    const authorizeResponse = await axios.get('http://localhost:8090/ExempleAuthorization/oauth/authorize',
         {
             headers: { 'x-auth-token': xAuthToken },
+            params: {
+                response_type: 'code',
+                client_id: 'test_service_user',
+                code_challenge: codeChallenge,
+                code_challenge_method: 'S256',
+                scope: 'account:read login:head login:read'
+            },
             maxRedirects: 0,
             validateStatus: function (status) {
                 return status >= 200 && status < 400;
@@ -86,16 +99,12 @@ Given('get access for username {string} and password {string}', async function (
     const params = {
         grant_type: 'authorization_code',
         code: code,
-        client_id: 'test_service_user',
-        redirect_uri: 'http://xxx'
+        code_verifier: codeVerifier,
+        client_id: 'test_service_user'
     };
     const tokenResponse = await axios.post('http://localhost:8090/ExempleAuthorization/oauth/token',
-        new URLSearchParams(params), {
-        auth: {
-            username: 'test_service_user',
-            password: 'secret'
-        }
-    });
+        new URLSearchParams(params)
+    );
     this.access_token = tokenResponse.data.access_token;
     console.log('get authorization ' + tokenResponse.status + '  token ' + this.access_token);
 });
