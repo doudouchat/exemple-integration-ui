@@ -1,6 +1,5 @@
 import { AfterAll, BeforeAll, Given } from '@cucumber/cucumber';
 import * as cassandra from 'cassandra-driver';
-import { v4 as uuidv4 } from 'uuid';
 import { AccountContext } from '../step-definitions/account.context';
 
 const client = new cassandra.Client({
@@ -71,7 +70,7 @@ Given('get access for username {string} and password {string}', async function (
         });
     const xAuthToken = loginResponse.headers['x-auth-token'];
 
-    const codeVerifier = uuidv4();
+    const codeVerifier = crypto.randomUUID();
     const codeChallenge = base64.stringify(sha256(codeVerifier));
 
     const authorizeResponse = await axios.get('http://localhost:8090/ExempleAuthorization/oauth/authorize',
