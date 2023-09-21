@@ -202,12 +202,12 @@ jobs:
       -  name: Build exemple authorization
          run: |
             mvn -f ${{ github.workspace }}/exemple-authorization --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=10.1.12-jdk17 ${{ github.workspace }}/exemple-authorization
+            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=10.1.13-jdk17 ${{ github.workspace }}/exemple-authorization
             docker-compose up -d authorization
       -  name: Build exemple service
          run: |
             mvn -f ${{ github.workspace }}/exemple-service --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.12-jdk17 ${{ github.workspace }}/exemple-service
+            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.13-jdk17 ${{ github.workspace }}/exemple-service
             docker-compose up -d service
       -  name: Build exemple gateway
          run: |
