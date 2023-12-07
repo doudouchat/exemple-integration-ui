@@ -232,6 +232,7 @@ jobs:
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
             npm ci
+            rm -rf node_modules/@types/long
             npm run-script e2e:docker
       -  name: display logs hazelcast
          if: ${{ always() }}
