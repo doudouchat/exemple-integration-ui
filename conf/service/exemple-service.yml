@@ -27,13 +27,6 @@ store:
 application:
    zookeeper:
       host: 172.17.0.1:10024
-event:
-   kafka:
-      bootstrap-servers: 172.17.0.1:10026
-   topics:
-      account: account_test
-      subscription: subscription_test
-   timeout: 10000
 api:
    authorization:
       jwkSetUri: http://172.17.0.1:8090/ExempleAuthorization/oauth/jwks
