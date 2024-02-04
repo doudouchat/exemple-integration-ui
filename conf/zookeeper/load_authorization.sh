@@ -16,7 +16,7 @@
 }'
 ./bin/zkCli.sh create /authorization/test_service
 ./bin/zkCli.sh set /authorization/test_service '{
-	"id": "test_service",
+"id": "test_service",
 	"clientId": "test_service",
 	"clientSecret": "{bcrypt}$2a$10$FTfSAcT9WVzgHIPqT6dGU.THUVQNReDhMXlB.aq1C8FCPPktD2.Lq",
 	"clientAuthenticationMethods": [
@@ -39,14 +39,16 @@
 ./bin/zkCli.sh set /authorization/test_service_user '{
 	"id": "test_service_user",
 	"clientId": "test_service_user",
-	"clientSecret": "{bcrypt}$2a$10$FTfSAcT9WVzgHIPqT6dGU.THUVQNReDhMXlB.aq1C8FCPPktD2.Lq",
 	"authorizationGrantTypes": [
 		"authorization_code",
 		"refresh"
 	],
 	"requireAuthorizationConsent": false,
+	"clientAuthenticationMethods": [
+		"none"
+	],
 	"redirectUris": [
-		"http://locahost:4200"
+		"http://xxx"
 	],
 	"scopes": [
 		"account:read",
@@ -73,6 +75,6 @@
 		"test_service_user"
 	],
 	"account": {
-        "uniqueProperties": [ "email" ]
-    }
+		"uniqueProperties": [ "email" ]
+	}
 }'
