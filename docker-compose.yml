@@ -1,7 +1,7 @@
 services:
   cassandra:
     container_name: exemple-cassandra
-    image: cassandra:4.1.6
+    image: cassandra:5.0.0
     networks:
     - test
     environment:
