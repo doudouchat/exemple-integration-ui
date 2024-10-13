@@ -32,7 +32,7 @@ concurrency:
   group: ${{ github.repository }}
   cancel-in-progress: false
 env:
-   MAVEN_OPTS: -Xmx1g
+   MAVEN_OPTS: -Xmx2g
 jobs:
    build:
       runs-on: ubuntu-latest
