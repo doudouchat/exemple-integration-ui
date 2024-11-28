@@ -1,5 +1,4 @@
-INSERT INTO test_service.resource_schema (app, version, resource, profile, content) VALUES (
-	'test',
+INSERT INTO test_service.resource_schema (version, resource, profile, content) VALUES (
 	'v1',
 	'account',
 	'user',
