@@ -39,7 +39,7 @@ services:
       start_period: 5s
   hazelcast:
     container_name: exemple-hazelcast
-    image: hazelcast/hazelcast:5.4.0
+    image: hazelcast/hazelcast:5.5.0
     networks:
     - test
     ports:
