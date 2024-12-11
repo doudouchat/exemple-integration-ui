@@ -27,7 +27,7 @@ on:
       branch_ui:
         description: 'UI branch'
         required: true
-        default: 'master'
+        default: 'angular'
 concurrency:
   group: ${{ github.repository }}
   cancel-in-progress: false
@@ -234,7 +234,7 @@ jobs:
       -  name: test exemple ui
          working-directory: ${{ github.workspace }}/exemple-ui/exemple-ui-front
          run: |
-            npm ci
+            npm ci --legacy-peer-deps
             rm -rf node_modules/@types/long
             npm run-script e2e:docker
       -  name: display logs hazelcast
