@@ -27,11 +27,12 @@ AfterAll(async () => {
 
 Given('delete username {string}', async (username: string) => {
     await client.execute('delete from test_authorization.login where username = ?', [username]);
-    const row = (await client.execute('select id from test_service.account where email = ?', [username])).first();
+    const row = (await client.execute('select id from test_service.account_username where username = ? and field = ?', [username, 'email'])).first();
     if (row) {
         const id = row.getObject(0);
         await client.execute('delete from test_service.account where id = ?', [id]);
     }
+    await client.execute('delete from test_service.account_username where username = ? and field = ?', [username, 'email']);
 });
 
 Given('get authorization to create account', async function (this: AccountContext) {
