@@ -205,12 +205,16 @@ jobs:
       -  name: Build exemple authorization
          run: |
             mvn -f ${{ github.workspace }}/exemple-authorization --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=10.1.33-jdk21 ${{ github.workspace }}/exemple-authorization
+            TOMCAT_VERSION=$(mvn -f ${{ github.workspace }}/exemple-authorization help:evaluate -Dexpression=tomcat.version -q -DforceStdout)-jdk21
+            echo tomcat version is $TOMCAT_VERSION
+            docker build -t exemple-authorization --build-arg VERSION_TOMCAT=${TOMCAT_VERSION} ${{ github.workspace }}/exemple-authorization
             docker compose up -d authorization
       -  name: Build exemple service
          run: |
             mvn -f ${{ github.workspace }}/exemple-service --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-service --build-arg VERSION_TOMCAT=10.1.33-jdk21 ${{ github.workspace }}/exemple-service
+            TOMCAT_VERSION=$(mvn -f ${{ github.workspace }}/exemple-service help:evaluate -Dexpression=tomcat.version -q -DforceStdout)-jdk21
+            echo tomcat version is $TOMCAT_VERSION
+            docker build -t exemple-service --build-arg VERSION_TOMCAT=${TOMCAT_VERSION} ${{ github.workspace }}/exemple-service
             docker compose up -d service
       -  name: Build exemple gateway
          run: |
