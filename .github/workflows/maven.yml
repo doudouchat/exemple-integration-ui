@@ -105,8 +105,12 @@ jobs:
             ref: ${{ github.event.inputs.branch_ui }}
       -  name: launch zookeeper
          run: |
-           docker compose up -d zookeeper
+           ZOOKEEPER_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=zookeeper.version -q -DforceStdout)
+           echo zookeeper version is $ZOOKEEPER_VERSION
+           echo 'ZOOKEEPER_VERSION='${ZOOKEEPER_VERSION} > ./zookeeper.env
+           docker compose --env-file ./zookeeper.env up -d zookeeper
            ./wait-for-container-ready.sh exemple-zookeeper
+           echo $(docker ps -f name=exemple-zookeeper --format "{{.Image}}") is ready!
            docker container exec exemple-zookeeper ls -la          
            docker container exec exemple-zookeeper bin/zkCli.sh create /authorization
            docker container exec exemple-zookeeper bin/zkCli.sh create /authorization/resource
@@ -188,16 +192,29 @@ jobs:
            }'
       -  name: launch hazelcast
          run: |
-           docker compose up -d hazelcast
+           HAZELCAST_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=hazelcast.version -q -DforceStdout)
+           echo hazelcast version is $HAZELCAST_VERSION
+           echo 'HAZELCAST_VERSION='${HAZELCAST_VERSION} > ./hazelcast.env
+           docker compose --env-file ./hazelcast.env up -d hazelcast
+           echo $(docker ps -f name=exemple-hazelcast --format "{{.Image}}") is ready!
       -  name: launch kafka
-         run: docker compose up -d kafka
+         run: |
+           KAFKA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=kafka.version -q -DforceStdout)
+           echo kafka version is $KAFKA_VERSION
+           echo 'KAFKA_VERSION='${KAFKA_VERSION} > ./kafka.env
+           docker compose --env-file ./kafka.env up -d kafka
+           echo $(docker ps -f name=exemple-kafka --format "{{.Image}}") is running!
       -  name: launch cassandra
          run: |
             mkdir resources
             cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
             cp conf/service/schemas/test_service_schema.cql resources/cassandra
-            docker compose up -d cassandra
+            CASSANDRA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=cassandra.version -q -DforceStdout)
+            echo cassandra version is $CASSANDRA_VERSION
+            echo 'CASSANDRA_VERSION='${CASSANDRA_VERSION} > ./cassandra.env
+            docker compose --env-file ./cassandra.env up -d cassandra
             ./wait-for-container-ready.sh exemple-cassandra
+            echo $(docker ps -f name=exemple-cassandra --format "{{.Image}}") is ready!
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/service.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/authorization.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql

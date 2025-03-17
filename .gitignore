@@ -12,3 +12,4 @@ node/
 npm-debug.log
 /.idea/
 **/*.iml
+versions.env
