@@ -236,7 +236,7 @@ jobs:
       -  name: Build exemple gateway
          run: |
             mvn -f ${{ github.workspace }}/exemple-gateway --batch-mode clean install -Dmaven.test.skip=true
-            docker build -t exemple-gateway --build-arg VERSION_OPENJDK=21-jdk ${{ github.workspace }}/exemple-gateway
+            docker build -t exemple-gateway --build-arg VERSION_TEMURIN=21-jdk ${{ github.workspace }}/exemple-gateway
             docker compose -f docker-compose.yml -f docker-compose.browser.yml up -d gateway
       -  name: Build exemple ui
          run: |
