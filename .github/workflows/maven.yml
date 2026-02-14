@@ -55,7 +55,7 @@ jobs:
       -  name: maven-settings-xml-action
          uses: whelk-io/maven-settings-xml-action@v22
          with:
-            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+            repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }, { "id": "projectlombok.org", "url": "https://projectlombok.org/edge-releases" }]'
             plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple service
          uses: actions/checkout@v5
