@@ -242,7 +242,7 @@ jobs:
          run: |
             NODE_VERSION=$(echo $(node -v) | grep -oP '(?<=v).*')
             echo node version is $NODE_VERSION
-            docker build -t exemple-ui --build-arg VERSION_NODE=${NODE_VERSION} --build-arg VERSION_NGINX=1.24.0 ${{ github.workspace }}/exemple-ui
+            docker build -t exemple-ui --build-arg VERSION_NODE=${NODE_VERSION} --build-arg VERSION_NGINX=1.28.2 ${{ github.workspace }}/exemple-ui
             docker compose up -d ui
       -  name: check authorization
          run: ./wait-for-container-ready.sh exemple-authorization
