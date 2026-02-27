@@ -6,14 +6,14 @@
   },
   "private": true,
   "devDependencies": {
-    "@cucumber/cucumber": "^12.0.0",
-    "@types/chai": "^5.2.2",
-    "@types/node": "^22.16.4",
-    "axios": "^1.10.0",
+    "@cucumber/cucumber": "^12.7.0",
+    "@types/chai": "^5.2.3",
+    "@types/node": "^24.10.15",
+    "axios": "^1.13.6",
     "cassandra-driver": "^4.8.0",
-    "chai": "^5.2.1",
+    "chai": "^6.2.2",
     "crypto-js": "^4.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
