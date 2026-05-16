@@ -1,8 +1,8 @@
 package com.exemple.service.customer.account
 
-import com.exemple.service.context.ServiceContextExecution
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.exemple.service.context.ServiceContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ObjectNode
 
 import groovy.transform.CompileDynamic
 
@@ -17,7 +17,7 @@ class AccountServiceImpl implements AccountService {
         UUID id = UUID.randomUUID()
 
         ((ObjectNode) account).put('id', id.toString())
-        ((ObjectNode) account).put('creation_date', ServiceContextExecution.context().date.toString())
+        ((ObjectNode) account).put('creation_date', ServiceContext.SERVICE_CONTEXT.get().date.toString())
 
         accountResource.create(account)
 
@@ -27,7 +27,7 @@ class AccountServiceImpl implements AccountService {
     @Override
     JsonNode update(JsonNode account) {
 
-        ((ObjectNode) account).put('update_date', ServiceContextExecution.context().date.toString())
+        ((ObjectNode) account).put('update_date', ServiceContext.SERVICE_CONTEXT.get().date.toString())
 
         accountResource.update(account)
 

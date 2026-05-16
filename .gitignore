@@ -6,7 +6,6 @@ target
 node_modules/
 .tscache/
 data/
-resources/
 node/
 .toDelete
 npm-debug.log

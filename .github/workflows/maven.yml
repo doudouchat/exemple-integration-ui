@@ -20,10 +20,6 @@ on:
         description: 'Gateway branch'
         required: true
         default: 'master'
-      branch_integration:
-        description: 'Integration branch'
-        required: true
-        default: 'master'
       branch_ui:
         description: 'UI branch'
         required: true
@@ -75,12 +71,6 @@ jobs:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
             ref: ${{ github.event.inputs.branch_gateway }}
-      -  name: Checkout exemple integration
-         uses: actions/checkout@v5
-         with:
-            path: exemple-integration
-            repository: doudouchat/exemple-integration
-            ref: ${{ github.event.inputs.branch_integration }}
       -  name: Get npm cache directory
          id: npm-cache-dir
          shell: bash
@@ -105,7 +95,7 @@ jobs:
             ref: ${{ github.event.inputs.branch_ui }}
       -  name: launch zookeeper
          run: |
-           ZOOKEEPER_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=zookeeper.version -q -DforceStdout)
+           ZOOKEEPER_VERSION=$(mvn -f ${{ github.workspace }}/exemple-service help:evaluate -Dexpression=zookeeper.version -q -DforceStdout)
            echo zookeeper version is $ZOOKEEPER_VERSION
            echo 'ZOOKEEPER_VERSION='${ZOOKEEPER_VERSION} > ./zookeeper.env
            docker compose --env-file ./zookeeper.env up -d zookeeper
@@ -192,24 +182,21 @@ jobs:
            }'
       -  name: launch hazelcast
          run: |
-           HAZELCAST_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=hazelcast.version -q -DforceStdout)
+           HAZELCAST_VERSION=$(mvn -f ${{ github.workspace }}/exemple-service help:evaluate -Dexpression=hazelcast.version -q -DforceStdout)
            echo hazelcast version is $HAZELCAST_VERSION
            echo 'HAZELCAST_VERSION='${HAZELCAST_VERSION} > ./hazelcast.env
            docker compose --env-file ./hazelcast.env up -d hazelcast
            echo $(docker ps -f name=exemple-hazelcast --format "{{.Image}}") is ready!
       -  name: launch kafka
          run: |
-           KAFKA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=kafka.version -q -DforceStdout)
+           KAFKA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-service help:evaluate -Dexpression=kafka.version -q -DforceStdout)
            echo kafka version is $KAFKA_VERSION
            echo 'KAFKA_VERSION='${KAFKA_VERSION} > ./kafka.env
            docker compose --env-file ./kafka.env up -d kafka
            echo $(docker ps -f name=exemple-kafka --format "{{.Image}}") is running!
       -  name: launch cassandra
          run: |
-            mkdir resources
-            cp -r ${{ github.workspace }}/exemple-integration/src/test/resources/cassandra resources
-            cp conf/service/schemas/test_service_schema.cql resources/cassandra
-            CASSANDRA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-integration help:evaluate -Dexpression=cassandra.version -q -DforceStdout)
+            CASSANDRA_VERSION=$(mvn -f ${{ github.workspace }}/exemple-service help:evaluate -Dexpression=cassandra.version -q -DforceStdout)
             echo cassandra version is $CASSANDRA_VERSION
             echo 'CASSANDRA_VERSION='${CASSANDRA_VERSION} > ./cassandra.env
             docker compose --env-file ./cassandra.env up -d cassandra
@@ -217,7 +204,6 @@ jobs:
             echo $(docker ps -f name=exemple-cassandra --format "{{.Image}}") is ready!
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/service.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/authorization.cql
-            docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql
             docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql
       -  name: Build exemple authorization
          run: |

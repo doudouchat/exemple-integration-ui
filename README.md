@@ -10,7 +10,6 @@
 <li>docker compose --env-file ./versions.env up -d cassandra</li>
 <li>docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/service.cql</li>
 <li>docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/authorization.cql</li>
-<li>docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/exec.cql</li>
 <li>docker container exec exemple-cassandra cqlsh --debug -f /usr/local/tmp/cassandra/test_service_schema.cql</li>
 <li>docker compose --env-file ./versions.env up -d hazelcast</li>
 <li>docker compose --env-file ./versions.env up -d kafka</li>
