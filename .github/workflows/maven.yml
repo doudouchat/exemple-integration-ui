@@ -43,16 +43,16 @@ jobs:
             distribution: 'zulu'
             java-version: 25
       -  name: Cache Maven packages
-         uses: actions/cache@v4
+         uses: actions/cache@v5
          with:
             path: ~/.m2
             key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
             restore-keys: ${{ runner.os }}-m2
       -  name: maven-settings-xml-action
-         uses: whelk-io/maven-settings-xml-action@v22
+         uses: s4u/maven-settings-action@v4.0.0
          with:
             repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
-            plugin_repositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
+            pluginRepositories: '[{ "id": "repository.spring.milestone", "url": "https://repo.spring.io/milestone" }]'
       -  name: Checkout exemple service
          uses: actions/checkout@v5
          with:
@@ -60,13 +60,13 @@ jobs:
             repository: doudouchat/exemple-service
             ref: ${{ github.event.inputs.branch_service }}
       -  name: Checkout exemple authorization
-         uses: actions/checkout@v5
+         uses: actions/checkout@v6
          with:
             path: exemple-authorization
             repository: doudouchat/exemple-authorization
             ref: ${{ github.event.inputs.branch_authorization }}
       -  name: Checkout exemple gateway
-         uses: actions/checkout@v5
+         uses: actions/checkout@v6
          with:
             path: exemple-gateway
             repository: doudouchat/exemple-gateway
@@ -76,19 +76,19 @@ jobs:
          shell: bash
          run: |
            echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-      -  uses: actions/cache@v4
+      -  uses: actions/cache@v5
          id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
          with:
            path: ${{ steps.npm-cache-dir.outputs.dir }}
            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
            restore-keys: |
             ${{ runner.os }}-node-
-      -  name: Use Node.js 24.13.1
+      -  name: Use Node.js
          uses: actions/setup-node@v6
          with:
-            node-version: 24.13.1
+            node-version: 24.16.0
       -  name: Checkout exemple ui
-         uses: actions/checkout@v5
+         uses: actions/checkout@v6
          with:
             path: exemple-ui
             repository: doudouchat/exemple-ui
