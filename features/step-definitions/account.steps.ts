@@ -1,8 +1,8 @@
 import { Then, When } from '@cucumber/cucumber';
+import axios from 'axios';
 import { AccountContext } from '../step-definitions/account.context';
 
 When('create account', { timeout: 10000 }, async function (this: AccountContext, account: string) {
-    const axios = require('axios');
     console.log('create account ' + account);
     const response = await axios.post('http://localhost:8080/ExempleService/ws/v1/accounts',
         JSON.parse(account),
@@ -15,7 +15,6 @@ When('create account', { timeout: 10000 }, async function (this: AccountContext,
 });
 
 Then('account is', async function (this: AccountContext, expectedAccount: string) {
-    const axios = require('axios');
     const response = await axios.get(`http://localhost:8080/ExempleService/ws/v1/accounts/${this.id}`,
         {
             headers: { 'app': 'test', 'version': 'v1', 'Authorization': 'Bearer ' + this.access_token }
