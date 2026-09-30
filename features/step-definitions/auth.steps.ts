@@ -1,14 +1,13 @@
 import { AfterAll, BeforeAll, Given } from '@cucumber/cucumber';
+import axios from 'axios';
 import * as cassandra from 'cassandra-driver';
+import forge from 'node-forge';
 import { AccountContext } from '../step-definitions/account.context';
 
 const client = new cassandra.Client({
     contactPoints: ['127.0.0.1:9042'],
     localDataCenter: 'datacenter1'
 });
-const axios = require('axios');
-const sha256 = require("crypto-js/sha256");
-const base64 = require("crypto-js/enc-base64url");
 
 BeforeAll(() => {
     axios.interceptors.request.use(request => {
@@ -72,7 +71,7 @@ Given('get access for username {string} and password {string}', async function (
     const xAuthToken = loginResponse.headers['x-auth-token'];
 
     const codeVerifier = crypto.randomUUID();
-    const codeChallenge = base64.stringify(sha256(codeVerifier));
+    const codeChallenge = generateCodeChallenge(codeVerifier);
 
     const authorizeResponse = await axios.get('http://localhost:8090/ExempleAuthorization/oauth/authorize',
         {
@@ -108,3 +107,15 @@ Given('get access for username {string} and password {string}', async function (
     this.access_token = tokenResponse.data.access_token;
     console.log('get authorization ' + tokenResponse.status + '  token ' + this.access_token);
 });
+
+function generateCodeChallenge(codeVerifier: string): string {
+    const sha256 = forge.md.sha256.create();
+    sha256.update(codeVerifier, 'utf8');
+
+    const base64 = forge.util.encode64(sha256.digest().getBytes());
+
+    return base64
+        .replaceAll('+', '-')
+        .replaceAll('/', '_')
+        .replace(/=+$/, '');
+}
